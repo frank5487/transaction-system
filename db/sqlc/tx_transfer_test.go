@@ -22,16 +22,17 @@ func TestTransferTx(t *testing.T) {
 
 	// run n concurrent transfer transaction
 	for i := 0; i < n; i++ {
-		go func() {
-			result, err := store.TransferTx(context.Background(), TransferTxParams{
-				FromAccountID: account1.ID,
-				ToAccountID:   account2.ID,
-				Amount:        amount,
-			})
-
-			errs <- err
-			results <- result
-		}()
+		//go func() {
+		//	result, err := store.TransferTx(context.Background(), TransferTxParams{
+		//		FromAccountID: account1.ID,
+		//		ToAccountID:   account2.ID,
+		//		Amount:        amount,
+		//	})
+		//
+		//	errs <- err
+		//	results <- result
+		//}()
+		go startTransfer(errs, results, store, account1, account2, amount)
 	}
 
 	// check results
@@ -112,6 +113,20 @@ func TestTransferTx(t *testing.T) {
 
 	require.Equal(t, account1.Balance-int64(n)*amount, updatedAccount1.Balance)
 	require.Equal(t, account2.Balance+int64(n)*amount, updatedAccount2.Balance)
+}
+
+// chan <-          writing to channel (output channel)
+// <- chan          reading from channel (input channel)
+// chan             read from or write to channel (input/output channel)
+func startTransfer(errs chan<- error, results chan<- TransferTxResult, store Store, account1 Account, account2 Account, amount int64) {
+	result, err := store.TransferTx(context.Background(), TransferTxParams{
+		FromAccountID: account1.ID,
+		ToAccountID:   account2.ID,
+		Amount:        amount,
+	})
+
+	errs <- err
+	results <- result
 }
 
 func TestTransferTxDeadlock(t *testing.T) {
