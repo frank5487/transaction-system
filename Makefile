@@ -24,5 +24,13 @@ migratedown:
 migratedown1:
 	migrate -path db/migration -database "$(DB_URL)" -verbose down 1
 
+sqlc:
+	sqlc generate
 
-.PHONY: postgres, createdb, dropdb initSchema migrateup migratedown migrateup1 migratedown1
+test:
+	go test -v -cover -short ./...
+
+server:
+	go run main.go
+
+.PHONY: postgres, createdb, dropdb initSchema migrateup migratedown migrateup1 migratedown1 sqlc test server
