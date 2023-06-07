@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/frank5487/tx_system/pb";
+
+import "rpc_create_user.proto";
+import "rpc_login_user.proto";
+
+service TxSystem {
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
+  rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {}
+}
