@@ -43,4 +43,7 @@ proto:
 	--grpc-gateway_out=pb --grpc-gateway_opt=paths=source_relative \
 	proto/*.proto
 
-.PHONY: postgres, createdb, dropdb initSchema migrateup migratedown migrateup1 migratedown1 sqlc test server mock proto
+redis:
+	sudo docker run --name redis -p 6379:6379 -d redis:7-alpine
+
+.PHONY: postgres, createdb, dropdb initSchema migrateup migratedown migrateup1 migratedown1 sqlc test server mock proto redis
