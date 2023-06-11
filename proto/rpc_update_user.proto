@@ -5,7 +5,6 @@ package pb;
 
 option go_package = "github.com/frank5487/tx_system/pb";
 
-
 message UpdateUserRequest {
   string username = 1;
   optional string full_name = 2;

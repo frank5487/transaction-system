@@ -6,6 +6,7 @@ import (
 	"github.com/frank5487/tx_system/api"
 	db "github.com/frank5487/tx_system/db/sqlc"
 	"github.com/frank5487/tx_system/gapi"
+	"github.com/frank5487/tx_system/mail"
 	"github.com/frank5487/tx_system/pb"
 	"github.com/frank5487/tx_system/util"
 	"github.com/frank5487/tx_system/worker"
@@ -48,7 +49,7 @@ func main() {
 	}
 
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
-	go runTaskProcessor(redisOpt, store)
+	go runTaskProcessor(config, redisOpt, store)
 	go runGatewayServer(config, store, taskDistributor)
 	runGrpcServer(config, store, taskDistributor)
 
@@ -68,8 +69,9 @@ func runDBMigration(migrationURL string, dbSource string) {
 	log.Info().Msg("db migrated successfully")
 }
 
-func runTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) {
-	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store)
+func runTaskProcessor(config util.Config, redisOpt asynq.RedisClientOpt, store db.Store) {
+	mailer := mail.NewGmailSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword)
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, mailer)
 	log.Info().Msg("start task processor")
 	err := taskProcessor.Start()
 	if err != nil {

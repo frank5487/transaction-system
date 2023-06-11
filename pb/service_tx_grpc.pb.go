@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TxSystem_CreateUser_FullMethodName = "/pb.TxSystem/CreateUser"
-	TxSystem_LoginUser_FullMethodName  = "/pb.TxSystem/LoginUser"
-	TxSystem_UpdateUser_FullMethodName = "/pb.TxSystem/UpdateUser"
+	TxSystem_CreateUser_FullMethodName  = "/pb.TxSystem/CreateUser"
+	TxSystem_LoginUser_FullMethodName   = "/pb.TxSystem/LoginUser"
+	TxSystem_UpdateUser_FullMethodName  = "/pb.TxSystem/UpdateUser"
+	TxSystem_VerifyEmail_FullMethodName = "/pb.TxSystem/VerifyEmail"
 )
 
 // TxSystemClient is the client API for TxSystem service.
@@ -31,6 +32,7 @@ type TxSystemClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
+	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error)
 }
 
 type txSystemClient struct {
@@ -68,6 +70,15 @@ func (c *txSystemClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, 
 	return out, nil
 }
 
+func (c *txSystemClient) VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error) {
+	out := new(VerifyEmailResponse)
+	err := c.cc.Invoke(ctx, TxSystem_VerifyEmail_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TxSystemServer is the server API for TxSystem service.
 // All implementations must embed UnimplementedTxSystemServer
 // for forward compatibility
@@ -75,6 +86,7 @@ type TxSystemServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
+	VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error)
 	mustEmbedUnimplementedTxSystemServer()
 }
 
@@ -90,6 +102,9 @@ func (UnimplementedTxSystemServer) LoginUser(context.Context, *LoginUserRequest)
 }
 func (UnimplementedTxSystemServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (UnimplementedTxSystemServer) VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyEmail not implemented")
 }
 func (UnimplementedTxSystemServer) mustEmbedUnimplementedTxSystemServer() {}
 
@@ -158,6 +173,24 @@ func _TxSystem_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TxSystem_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TxSystemServer).VerifyEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TxSystem_VerifyEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TxSystemServer).VerifyEmail(ctx, req.(*VerifyEmailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TxSystem_ServiceDesc is the grpc.ServiceDesc for TxSystem service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -176,6 +209,10 @@ var TxSystem_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateUser",
 			Handler:    _TxSystem_UpdateUser_Handler,
+		},
+		{
+			MethodName: "VerifyEmail",
+			Handler:    _TxSystem_VerifyEmail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
